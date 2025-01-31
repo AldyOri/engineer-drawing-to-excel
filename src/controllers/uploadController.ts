@@ -1,28 +1,58 @@
 import { Request, Response } from "express";
+import { UPLOADS_DIR } from "../constants/constants";
 import fs from "fs";
+import path from "path";
 
-export const uploadFile = async (
+interface UploadResponse {
+  message: string;
+  files?: string[];
+  error?: string;
+}
+
+export const uploadFiles = async (
   req: Request,
-  res: Response
-): Promise<void | any> => {
+  res: Response<UploadResponse>
+): Promise<void> => {
   try {
-    if (!req.file) {
-      return res.status(400).send({ message: "no file found" });
-      //   return;
+    // Ensure uploads directory exists
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+      console.log(`Created uploads directory at ${UPLOADS_DIR}`);
     }
 
-    const filePath = req.file.path;
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+      res.status(400).json({
+        message: "No files uploaded",
+        error: "Please upload at least one PDF file",
+      });
+      return;
+    }
 
+    // Validate files
+    const files = req.files as Express.Multer.File[];
+    const invalidFiles = files.filter((file) => !file.mimetype.includes("pdf"));
 
+    if (invalidFiles.length > 0) {
+      res.status(400).json({
+        message: "Invalid file type",
+        error: "Only PDF files are allowed",
+        files: invalidFiles.map((f) => f.originalname),
+      });
+      return;
+    }
 
-    res.download(filePath, (err) => {
-      if (err) throw err;
+    const fileNames = files.map((file) => file.filename);
+    console.log(`Successfully uploaded ${fileNames.length} files`);
 
-      // Clean up files after download
-      fs.unlinkSync(filePath); // Delete uploaded file
+    res.status(200).json({
+      message: "Files uploaded successfully",
+      files: fileNames,
     });
   } catch (error) {
-    console.error("Error processing file:", error);
-    res.status(500).send("Something went wrong.");
+    console.error("Error uploading files:", error);
+    res.status(500).json({
+      message: "Error uploading files",
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    });
   }
 };
