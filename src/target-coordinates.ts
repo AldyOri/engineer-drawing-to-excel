@@ -22,7 +22,7 @@ const targetCoordinates: TargetCoordinate[] = [
     yEnd: 698,
   },
   {
-    label: "Nama Gambar", // to do exclude kata "title :"
+    label: "Nama Gambar",
     xStart: 72,
     yStart: 672,
     xEnd: 97,

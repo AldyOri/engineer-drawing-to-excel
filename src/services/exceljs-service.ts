@@ -19,7 +19,6 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
   const worksheet = workbook.addWorksheet(
     new Date().toLocaleDateString("id-ID", {
       month: "long",
-      year: "numeric",
     })
   );
   worksheet.views = [
@@ -51,7 +50,6 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
 
   // Add an empty row before the header row
   worksheet.addRow([]);
-
 
   // Set row heights
   worksheet.getRow(3).height = 15.6;
