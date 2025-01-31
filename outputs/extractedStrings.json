@@ -1,0 +1,96 @@
+[
+  {
+    "fileName": "test.pdf",
+    "data": [
+      {
+        "label": "Proyek",
+        "strings": []
+      },
+      {
+        "label": "No Gambar",
+        "strings": [
+          "86.2-E12103"
+        ]
+      },
+      {
+        "label": "Nama Gambar",
+        "strings": [
+          "SCHEMATIC DIAGRAM OF ENDWALL CONTROL PANEL B TC1 & TC2"
+        ]
+      },
+      {
+        "label": "Type",
+        "strings": [
+          "TC1",
+          "TC2"
+        ]
+      },
+      {
+        "label": "Size",
+        "strings": [
+          "A2"
+        ]
+      },
+      {
+        "label": "Sheet",
+        "strings": [
+          "6"
+        ]
+      },
+      {
+        "label": "Rev",
+        "strings": [
+          "D"
+        ]
+      },
+      {
+        "label": "Tanggal Drawing",
+        "strings": [
+          "06/01/2025"
+        ]
+      },
+      {
+        "label": "Tanggal Release",
+        "strings": []
+      },
+      {
+        "label": "Drafter",
+        "strings": [
+          "SAB"
+        ]
+      },
+      {
+        "label": "Checker",
+        "strings": [
+          "TRP"
+        ]
+      },
+      {
+        "label": "Approval",
+        "strings": [
+          "RIE"
+        ]
+      },
+      {
+        "label": "Welding",
+        "strings": []
+      },
+      {
+        "label": "Integration",
+        "strings": [
+          "LGA"
+        ]
+      },
+      {
+        "label": "Mechanical System",
+        "strings": []
+      },
+      {
+        "label": "Ket",
+        "strings": [
+          "KA/DE/255/2024"
+        ]
+      }
+    ]
+  }
+]

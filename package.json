@@ -1,0 +1,28 @@
+{
+  "name": "engineer-drawing-to-excel",
+  "version": "1.0.0",
+  "description": "web based app that scrape data from engineer drawing and map it into an excel file",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aldy Nugroho",
+  "license": "ISC",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "pdf.js-extract": "^0.2.1",
+    "scribe.js-ocr": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.10.7",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
