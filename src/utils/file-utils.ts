@@ -21,7 +21,7 @@ export class FileUtils {
     const debugFileName = `debug_${path.basename(
       filePath,
       ".pdf"
-    )}_${timestamp}.json`;
+    )}.json`;
 
     await FileUtils.ensureDirectoryExists(outputsDir);
     await fs.writeFile(

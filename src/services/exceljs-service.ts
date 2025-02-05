@@ -138,14 +138,18 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
   const rows: ExcelRowData[] = data.map((file, fileIndex) => {
     const drawingDate =
       file.data.find((d) => d.label === "Tanggal Drawing")?.strings[0] || "";
+
     const formattedDrawingDate = drawingDate
-      ? new Date(drawingDate.split("/").reverse().join("-"))
-          .toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          })
-          .replace(/ /g, "-")
+      ? new Date(
+          drawingDate
+            .split(/[-\/]/)  
+            .reverse() 
+            .join("-") 
+        ).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short", 
+          year: "numeric", 
+        })
       : "";
 
     const row: ExcelRowData = {

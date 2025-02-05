@@ -1,5 +1,3 @@
-import { Column } from "exceljs";
-
 export interface ExcelColumn {
   header: string;
   key: string;

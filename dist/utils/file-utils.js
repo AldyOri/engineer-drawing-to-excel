@@ -17,7 +17,7 @@ class FileUtils {
     }
     static async saveDebugData(data, filePath, outputsDir) {
         const timestamp = new Date().toISOString().replace(/[:]/g, "-");
-        const debugFileName = `debug_${path_1.default.basename(filePath, ".pdf")}_${timestamp}.json`;
+        const debugFileName = `debug_${path_1.default.basename(filePath, ".pdf")}.json`;
         await FileUtils.ensureDirectoryExists(outputsDir);
         await promises_1.default.writeFile(path_1.default.join(outputsDir, debugFileName), JSON.stringify(data, null, 2));
         console.log(`Debug data saved to ${debugFileName}`);

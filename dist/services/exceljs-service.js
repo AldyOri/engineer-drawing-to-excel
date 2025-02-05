@@ -15,7 +15,6 @@ async function generateExcel(data) {
     // Create worksheet
     const worksheet = workbook.addWorksheet(new Date().toLocaleDateString("id-ID", {
         month: "long",
-        year: "numeric",
     }));
     worksheet.views = [
         {
@@ -113,13 +112,14 @@ async function generateExcel(data) {
     const rows = data.map((file, fileIndex) => {
         const drawingDate = file.data.find((d) => d.label === "Tanggal Drawing")?.strings[0] || "";
         const formattedDrawingDate = drawingDate
-            ? new Date(drawingDate.split("/").reverse().join("-"))
-                .toLocaleDateString("en-GB", {
-                day: "numeric",
+            ? new Date(drawingDate
+                .split(/[-\/]/)
+                .reverse()
+                .join("-")).toLocaleDateString("en-GB", {
+                day: "2-digit",
                 month: "short",
                 year: "numeric",
             })
-                .replace(/ /g, "-")
             : "";
         const row = {
             no: fileIndex + 1,

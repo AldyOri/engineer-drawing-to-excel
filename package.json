@@ -14,8 +14,9 @@
     "exceljs": "^4.4.0",
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
+    "pdf-lib": "^1.17.1",
     "pdf.js-extract": "^0.2.1",
-    "scribe.js-ocr": "^0.7.0"
+    "pdfjs-dist": "^4.10.38"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
