@@ -1,19 +1,17 @@
-interface Zone {
+export interface Zone {
   xStart: number;
   xEnd: number;
   yStart: number;
   yEnd: number;
+  origin?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 }
 
 interface ExtractionConfig {
   label: string;
   pattern: RegExp;
+  excludePattern?: RegExp;
   zones: Zone[];
 }
-
-// notes to self
-// zones [0] => top left origin
-// zones [1] => bottom left origin
 
 export const EXTRACTION_CONFIG: ExtractionConfig[] = [
   {
@@ -33,41 +31,47 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
     pattern: /^\d{2,3}\.\d-E\d{5}$/,
     zones: [
       {
-        xStart: 730,
-        xEnd: 825,
-        yStart: 1130,
-        yEnd: 1180,
+        xStart: 1191 / 2,
+        xEnd: 1191,
+        yStart: 750,
+        yEnd: 842,
+        origin: "top-left",
       },
       {
-        xStart: 30,
-        xEnd: 140,
-        yStart: 1040,
-        yEnd: 1080,
-      },
-      {
-        xStart: 130,
-        xEnd: 220,
-        yStart: 35,
-        yEnd: 80,
+        xStart: 0,
+        xEnd: 1191 / 2,
+        yStart: 0,
+        yEnd: 824 / 2,
+        origin: "bottom-right",
       },
     ],
   },
   {
-    label: "Nama Gambar", // to do, fix the regex
+    label: "Nama Gambar",
     pattern:
       /^(?:(?:COMPONENT|SCHEMATIC|WIRING|TB|SINGLE LINE|ARCHITECTURE)\s+(?:LAYOUT|INSTALLATION|DIAGRAM|TABLE|CONNECTION)\s+OF(?:\s+[A-Z0-9\s\-&',.\/]+)?|[A-Z0-9\s\-&',.\/]+|&\s+[A-Z0-9]+)$/,
+    excludePattern: /^(?:RIE|\d{2}[-\/]\d{2}[-\/]\d{4}|TRP|\d+)$/,
     zones: [
       {
-        xStart: 677,
-        xEnd: 767,
-        yStart: 1023,
-        yEnd: 1087,
+        xStart: 960,
+        xEnd: 1160,
+        yStart: 710,
+        yEnd: 752,
+        origin: "top-left",
       },
       {
-        xStart: 71,
-        xEnd: 97,
-        yStart: 1020,
-        yEnd: 1085,
+        xStart: 1028,
+        xEnd: 1138,
+        yStart: 749,
+        yEnd: 772,
+        origin: "top-left",
+      },
+      {
+        xStart: 70,
+        xEnd: 150,
+        yStart: 100,
+        yEnd: 140,
+        origin: "bottom-right",
       },
     ],
   },
@@ -77,16 +81,18 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
       /^(?:TC[1-3]?|M[1-2]?|T[1-3]?(?:\s*&\s*T1')?|KRL(?:\s+KCI)?|EMU)(?:\s*[,;&]\s*(?:TC[1-3]?|M[1-2]?|T[1-3]?(?:\s*&\s*T1')?|KRL(?:\s+KCI)?|EMU))*$/,
     zones: [
       {
-        xStart: 525,
-        xEnd: 620,
-        yStart: 960,
-        yEnd: 1069,
+        xStart: 1191 / 2,
+        xEnd: 1191,
+        yStart: 421,
+        yEnd: 842,
+        origin: "top-left",
       },
       {
-        xStart: 89,
-        xEnd: 105,
-        yStart: 837,
-        yEnd: 872,
+        xStart: 0,
+        xEnd: 1191 / 2,
+        yStart: 0,
+        yEnd: 842 / 2,
+        origin: "bottom-right",
       },
     ],
   },
@@ -95,58 +101,59 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
     pattern: /^A[1-4]$/i,
     zones: [
       {
-        xStart: 772,
-        xEnd: 814,
-        yStart: 1163,
-        yEnd: 1175,
+        xStart: 1091,
+        xEnd: 1191,
+        yStart: 812,
+        yEnd: 842,
+        origin: "top-left",
       },
       {
-        xStart: 14,
-        xEnd: 19,
-        yStart: 1141,
-        yEnd: 1175,
+        xStart: 0,
+        xEnd: 100,
+        yStart: 0,
+        yEnd: 30,
+        origin: "bottom-right",
       },
     ],
   },
   {
-    label: "Sheet",
+    label: "Sheet", // unused
     pattern: /^\d{1,3}$/,
     zones: [
-      {
-        xStart: 612,
-        xEnd: 620,
-        yStart: 1105,
-        yEnd: 1120,
-      },
-      {
-        xStart: 500,
-        xEnd: 550,
-        yStart: 1080,
-        yEnd: 1100,
-      },
-      {
-        xStart: 55,
-        xEnd: 60,
-        yStart: 869,
-        yEnd: 875,
-      },
+      // {
+      //   xStart: 0, // 800
+      //   xEnd: 0, // 820
+      //   yStart: 0, // 760
+      //   yEnd: 0, // 780
+      //   origin: "top-left",
+      // },
     ],
   },
   {
     label: "Rev",
-    pattern: /^[A-F0]$/i,
+    pattern: /^[A-Z0]$/i,
+    excludePattern: /^REV$/i,
     zones: [
       {
-        xStart: 180,
-        xEnd: 195,
-        yStart: 1130,
-        yEnd: 1170,
+        xStart: 877,
+        xEnd: 960,
+        yStart: 615,
+        yEnd: 660,
+        origin: "top-left",
       },
       {
-        xStart: 180,
-        xEnd: 195,
-        yStart: 35,
-        yEnd: 75,
+        xStart: 970,
+        xEnd: 1027,
+        yStart: 681,
+        yEnd: 714,
+        origin: "top-left",
+      },
+      {
+        xStart: 117,
+        xEnd: 158,
+        yStart: 185,
+        yEnd: 229,
+        origin: "bottom-right",
       },
     ],
   },
@@ -154,23 +161,19 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
     label: "Tanggal Drawing",
     pattern: /^(?:\d{2}[-/]\d{2}[-/]\d{4})$/,
     zones: [
-      // {
-      //   xStart: 335,
-      //   xEnd: 336,
-      //   yStart: 870,
-      //   yEnd: 875,
-      // },
       {
-        xStart: 0,
-        xEnd: 562,
-        yStart: 595,
-        yEnd: 1191,
+        xStart: 415,
+        xEnd: 722,
+        yStart: 615,
+        yEnd: 747,
+        origin: "top-left",
       },
       {
-        xStart: 90,
-        xEnd: 150,
-        yStart: 35,
-        yEnd: 75,
+        xStart: 330,
+        xEnd: 340,
+        yStart: 140,
+        yEnd: 150,
+        origin: "bottom-right",
       },
     ],
   },
@@ -189,18 +192,28 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
   {
     label: "Drafter",
     pattern: /^[A-Z]{2,3}$/,
+    excludePattern: /^REVISED\s+BY$/i,
     zones: [
       {
-        xStart: 500,
-        xEnd: 580,
-        yStart: 1100,
-        yEnd: 1160,
+        xStart: 868,
+        xEnd: 980,
+        yStart: 496,
+        yEnd: 615,
+        origin: "top-left",
       },
       {
-        xStart: 500,
-        xEnd: 580,
-        yStart: 35,
-        yEnd: 75,
+        xStart: 960,
+        xEnd: 1027,
+        yStart: 482,
+        yEnd: 682,
+        origin: "top-left",
+      },
+      {
+        xStart: 117,
+        xEnd: 170,
+        yStart: 230,
+        yEnd: 430,
+        origin: "bottom-right",
       },
     ],
   },
@@ -209,16 +222,25 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
     pattern: /^[A-Z]{2,3}$/,
     zones: [
       {
-        xStart: 590,
-        xEnd: 670,
-        yStart: 1100,
-        yEnd: 1160,
+        xStart: 870,
+        xEnd: 890,
+        yStart: 700,
+        yEnd: 720,
+        origin: "top-left"
       },
       {
-        xStart: 590,
-        xEnd: 670,
-        yStart: 35,
-        yEnd: 75,
+        xStart: 960,
+        xEnd: 985,
+        yStart: 742,
+        yEnd: 762,
+        origin: "top-left"
+      },
+      {
+        xStart: 145,
+        xEnd: 165,
+        yStart: 125,
+        yEnd: 145,
+        origin: "bottom-right"
       },
     ],
   },
@@ -227,16 +249,25 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
     pattern: /^[A-Z]{3}$/,
     zones: [
       {
-        xStart: 480,
-        xEnd: 520,
-        yStart: 1120,
-        yEnd: 1160,
+        xStart: 870,
+        xEnd: 890,
+        yStart: 660,
+        yEnd: 680,
+        origin: "top-left",
       },
       {
-        xStart: 480,
-        xEnd: 520,
-        yStart: 35,
-        yEnd: 75,
+        xStart: 950,
+        xEnd: 985,
+        yStart: 714,
+        yEnd: 734,
+        origin: "top-left",
+      },
+      {
+        xStart: 145,
+        xEnd: 165,
+        yStart: 165,
+        yEnd: 185,
+        origin: "bottom-right",
       },
     ],
   },
@@ -257,16 +288,25 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
     pattern: /^(LGA|SSR)$/,
     zones: [
       {
-        xStart: 570,
-        xEnd: 620,
-        yStart: 1100,
-        yEnd: 1160,
+        xStart: 0,
+        xEnd: 1191 / 2,
+        yStart: 842 / 2,
+        yEnd: 842,
+        origin: "top-left",
       },
       {
-        xStart: 570,
-        xEnd: 620,
-        yStart: 35,
-        yEnd: 75,
+        xStart: 1191 / 3,
+        xEnd: 1191 * (2 / 3),
+        yStart: 842 * (3 / 4),
+        yEnd: 824,
+        origin: "top-left",
+      },
+      {
+        xStart: 824 / 3,
+        xEnd: 824 * (2 / 3),
+        yStart: 0,
+        yEnd: 1191 / 4,
+        origin: "bottom-right",
       },
     ],
   },
@@ -287,16 +327,18 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
     pattern: /^KA\/(DE|EES)\/\d{1,3}\/\d{2,4}$/,
     zones: [
       {
-        xStart: 421,
-        xEnd: 842,
-        yStart: 595,
-        yEnd: 1191,
+        xStart: 1191 / 2,
+        xEnd: 1191,
+        yStart: 842 / 2,
+        yEnd: 842,
+        origin: "top-left",
       },
       {
-        xStart: 421,
-        xEnd: 842,
-        yStart: 595,
-        yEnd: 0,
+        xStart: 0,
+        xEnd: 1191 / 2,
+        yStart: 0,
+        yEnd: 842 / 2,
+        origin: "bottom-right",
       },
     ],
   },

@@ -57,6 +57,12 @@ class PDFService {
             const data = await this.pdfExtract.extract(tempFile, this.options);
             await file_utils_1.FileUtils.saveDebugData(data, filePath, outputsDir);
             const extractedData = extraction_config_1.EXTRACTION_CONFIG.map((config) => {
+                if (config.label === "Sheet") {
+                    return {
+                        label: config.label,
+                        strings: [data.pages.length.toString()],
+                    };
+                }
                 const strings = [
                     ...new Set(data.pages[0].content
                         .filter((item) => {
@@ -69,7 +75,9 @@ class PDFService {
                             return false;
                         // Then verify if text matches pattern
                         const trimmedText = item.str.trim();
-                        return config.pattern.test(trimmedText);
+                        return (config.pattern.test(trimmedText) &&
+                            (!config.excludePattern ||
+                                !config.excludePattern.test(trimmedText)));
                     })
                         .map((item) => item.str.trim())
                         .filter((str) => str !== "")),

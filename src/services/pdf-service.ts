@@ -4,7 +4,7 @@ import { FileUtils } from "../utils/file-utils";
 import path from "path";
 import fs from "fs/promises";
 import { normalizePDF } from "../utils/pdf-utils";
-import { EXTRACTION_CONFIG } from "../config/extraction-config";
+import { EXTRACTION_CONFIG, Zone } from "../config/extraction-config";
 
 export class PDFService {
   private pdfExtract: PDFExtract;
@@ -65,6 +65,13 @@ export class PDFService {
       await FileUtils.saveDebugData(data, filePath, outputsDir);
 
       const extractedData = EXTRACTION_CONFIG.map((config) => {
+        if (config.label === "Sheet") {
+          return {
+            label: config.label,
+            strings: [data.pages.length.toString()],
+          };
+        }
+
         const strings = [
           ...new Set(
             data.pages[0].content
@@ -81,7 +88,11 @@ export class PDFService {
 
                 // Then verify if text matches pattern
                 const trimmedText = item.str.trim();
-                return config.pattern.test(trimmedText);
+                return (
+                  config.pattern.test(trimmedText) &&
+                  (!config.excludePattern ||
+                    !config.excludePattern.test(trimmedText))
+                );
               })
               .map((item) => item.str.trim())
               .filter((str) => str !== "")
