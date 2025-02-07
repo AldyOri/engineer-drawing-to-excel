@@ -16,27 +16,27 @@ exports.EXTRACTION_CONFIG = [
     },
     {
         label: "No Gambar",
-        pattern: /^\d{2,3}\.\d-E\d{5}$/,
+        pattern: /^\d{2,3}\.\d-[A-Z]\d{5}$/,
         zones: [
             {
-                xStart: 1191 / 2,
+                xStart: 1191 * (3 / 4),
                 xEnd: 1191,
-                yStart: 750,
+                yStart: 842 - 100,
                 yEnd: 842,
                 origin: "top-left",
             },
             {
                 xStart: 0,
-                xEnd: 1191 / 2,
+                xEnd: 1191 / 4,
                 yStart: 0,
-                yEnd: 824 / 2,
+                yEnd: 0 + 200,
                 origin: "bottom-right",
             },
         ],
     },
     {
         label: "Nama Gambar",
-        pattern: /^(?:(?:COMPONENT|SCHEMATIC|WIRING|TB|SINGLE LINE|ARCHITECTURE)\s+(?:LAYOUT|INSTALLATION|DIAGRAM|TABLE|CONNECTION)\s+OF(?:\s+[A-Z0-9\s\-&',.\/]+)?|[A-Z0-9\s\-&',.\/]+|&\s+[A-Z0-9]+)$/,
+        pattern: /^(?:(?:COMPONENT|SCHEMATIC|WIRING|TB|SINGLE LINE|ARCHITECTURE)\s+(?:LAYOUT|INSTALLATION|DIAGRAM|TABLE|CONNECTION)\s+OF(?:\s+[A-Z0-9\s\-&',.\/]+)?|[A-Z0-9\s\-&',.\/\s]+)$/,
         excludePattern: /^(?:RIE|\d{2}[-\/]\d{2}[-\/]\d{4}|TRP|\d+)$/,
         zones: [
             {
@@ -47,7 +47,7 @@ exports.EXTRACTION_CONFIG = [
                 origin: "top-left",
             },
             {
-                xStart: 1028,
+                xStart: 1025,
                 xEnd: 1138,
                 yStart: 749,
                 yEnd: 772,
@@ -64,12 +64,12 @@ exports.EXTRACTION_CONFIG = [
     },
     {
         label: "Type",
-        pattern: /^(?:TC[1-3]?|M[1-2]?|T[1-3]?(?:\s*&\s*T1')?|KRL(?:\s+KCI)?|EMU)(?:\s*[,;&]\s*(?:TC[1-3]?|M[1-2]?|T[1-3]?(?:\s*&\s*T1')?|KRL(?:\s+KCI)?|EMU))*$/,
+        pattern: /^(?:TC[1-3]?|M[1-2]?|T[1-3]?|T1'|KRL(?:\s+KCI)?|EMU(?:-R)?|612)(?:\s*[,;&]\s*(?:TC[1-3]?|M[1-2]?|T[1-3]?|T1'|KRL(?:\s+KCI)?|EMU(?:-R)?|612))*$/,
         zones: [
             {
                 xStart: 1191 / 2,
                 xEnd: 1191,
-                yStart: 421,
+                yStart: 824 / 2,
                 yEnd: 842,
                 origin: "top-left",
             },
@@ -178,7 +178,7 @@ exports.EXTRACTION_CONFIG = [
     {
         label: "Drafter",
         pattern: /^[A-Z]{2,3}$/,
-        excludePattern: /^REVISED\s+BY$/i,
+        excludePattern: /^(?:REVISED\s+BY|PCS|SET)$/i,
         zones: [
             {
                 xStart: 868,
@@ -211,22 +211,22 @@ exports.EXTRACTION_CONFIG = [
                 xStart: 870,
                 xEnd: 890,
                 yStart: 700,
-                yEnd: 720,
-                origin: "top-left"
+                yEnd: 730,
+                origin: "top-left",
             },
             {
                 xStart: 960,
                 xEnd: 985,
                 yStart: 742,
                 yEnd: 762,
-                origin: "top-left"
+                origin: "top-left",
             },
             {
                 xStart: 145,
                 xEnd: 165,
                 yStart: 125,
                 yEnd: 145,
-                origin: "bottom-right"
+                origin: "bottom-right",
             },
         ],
     },
@@ -238,7 +238,7 @@ exports.EXTRACTION_CONFIG = [
                 xStart: 870,
                 xEnd: 890,
                 yStart: 660,
-                yEnd: 680,
+                yEnd: 690,
                 origin: "top-left",
             },
             {

@@ -55,6 +55,7 @@ class PDFService {
             tempFile = path_1.default.join(outputsDir, `normalized_${path_1.default.basename(filePath)}`);
             await promises_1.default.writeFile(tempFile, normalizedPdfBytes);
             const data = await this.pdfExtract.extract(tempFile, this.options);
+            const origin = this.detectOrigin(data);
             await file_utils_1.FileUtils.saveDebugData(data, filePath, outputsDir);
             const extractedData = extraction_config_1.EXTRACTION_CONFIG.map((config) => {
                 if (config.label === "Sheet") {
@@ -63,11 +64,16 @@ class PDFService {
                         strings: [data.pages.length.toString()],
                     };
                 }
+                // Filter zones to only use those matching detected origin
+                const activeZones = config.zones.filter((zone) => zone.origin === origin);
+                if (!activeZones.length && config.zones.length) {
+                    activeZones.push(config.zones[0]); // Use first zone if none match
+                }
                 const strings = [
                     ...new Set(data.pages[0].content
                         .filter((item) => {
                         // First check coordinates
-                        const inZone = config.zones.some((zone) => item.x >= zone.xStart &&
+                        const inZone = activeZones.some((zone) => item.x >= zone.xStart &&
                             item.x <= zone.xEnd &&
                             item.y >= zone.yStart &&
                             item.y <= zone.yEnd);
@@ -97,6 +103,25 @@ class PDFService {
                 await promises_1.default.unlink(tempFile);
             }
         }
+    }
+    detectOrigin(data) {
+        // Find text starting with "DITTEK"
+        const dittekItem = data.pages[0].content.find((item) => item.str.trim().startsWith("DITTEK"));
+        if (!dittekItem) {
+            return "top-left"; // Default if not found
+        }
+        const { x, y } = dittekItem;
+        const threshold = 100; // Adjust this value based on your needs
+        // Check position relative to page dimensions
+        const isLeftSide = x < threshold;
+        const isBottomSide = y < threshold;
+        if (isLeftSide && isBottomSide)
+            return "bottom-left";
+        if (!isLeftSide && isBottomSide)
+            return "bottom-right";
+        if (isLeftSide && !isBottomSide)
+            return "top-left";
+        return "top-right";
     }
 }
 exports.PDFService = PDFService;

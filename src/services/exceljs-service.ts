@@ -168,21 +168,15 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
         file.data
           .find((d) => d.label === "Tanggal Release")
           ?.strings.join(" ") || "",
-      drafter:
-        file.data.find((d) => d.label === "Drafter")?.strings.join(" ") || "",
-      checker:
-        file.data.find((d) => d.label === "Checker")?.strings.join(" ") || "",
-      approval:
-        file.data.find((d) => d.label === "Approval")?.strings.join(" ") || "",
-      welding:
-        file.data.find((d) => d.label === "Welding")?.strings.join(" ") || "",
+      drafter: file.data.find((d) => d.label === "Drafter")?.strings[0] || "",
+      checker: file.data.find((d) => d.label === "Checker")?.strings[0] || "",
+      approval: file.data.find((d) => d.label === "Approval")?.strings[0] || "",
+      welding: file.data.find((d) => d.label === "Welding")?.strings[0] || "",
       integration:
-        file.data.find((d) => d.label === "Integration")?.strings.join(" ") ||
-        "",
+        file.data.find((d) => d.label === "Integration")?.strings[0] || "",
       mechanicalSystem:
-        file.data
-          .find((d) => d.label === "Mechanical System")
-          ?.strings.join(" ") || "",
+        file.data.find((d) => d.label === "Mechanical System")?.strings[0] ||
+        "",
       remarks:
         file.data.find((d) => d.label === "Ket")?.strings.join(" ") || "",
     };
@@ -196,7 +190,11 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
   addedRows.forEach((row) => {
     row.height = 31.1;
     row.eachCell((cell) => {
-      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.alignment = {
+        vertical: "middle",
+        horizontal: "center",
+        wrapText: true,
+      };
       cell.font = { size: 12 };
       cell.border = {
         top: { style: "thin" },
