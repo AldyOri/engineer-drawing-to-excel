@@ -63,7 +63,7 @@ export class PDFService {
 
       const data = await this.pdfExtract.extract(tempFile, this.options);
       const origin = this.detectOrigin(data);
-      await FileUtils.saveDebugData(data, filePath, outputsDir);
+      // await FileUtils.saveDebugData(data, filePath, outputsDir);
 
       const extractedData = EXTRACTION_CONFIG.map((config) => {
         if (config.label === "Sheet") {

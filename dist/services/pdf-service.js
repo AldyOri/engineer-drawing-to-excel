@@ -56,7 +56,7 @@ class PDFService {
             await promises_1.default.writeFile(tempFile, normalizedPdfBytes);
             const data = await this.pdfExtract.extract(tempFile, this.options);
             const origin = this.detectOrigin(data);
-            await file_utils_1.FileUtils.saveDebugData(data, filePath, outputsDir);
+            // await FileUtils.saveDebugData(data, filePath, outputsDir);
             const extractedData = extraction_config_1.EXTRACTION_CONFIG.map((config) => {
                 if (config.label === "Sheet") {
                     return {
