@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { UPLOADS_DIR } from "../constants/constants";
+import { UPLOADS_DIR_V1 } from "../../constants/constants";
 import fs from "fs";
-import path from "path";
 
 interface UploadResponse {
   message: string;
@@ -15,9 +14,9 @@ export const uploadFiles = async (
 ): Promise<void> => {
   try {
     // Ensure uploads directory exists
-    if (!fs.existsSync(UPLOADS_DIR)) {
-      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-      console.log(`Created uploads directory at ${UPLOADS_DIR}`);
+    if (!fs.existsSync(UPLOADS_DIR_V1)) {
+      fs.mkdirSync(UPLOADS_DIR_V1, { recursive: true });
+      console.log(`Created uploads directory at ${UPLOADS_DIR_V1}`);
     }
 
     if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {

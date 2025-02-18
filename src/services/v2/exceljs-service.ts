@@ -1,8 +1,8 @@
 import { Workbook } from "exceljs";
 import { Buffer } from "node:buffer";
-import { ExtractedData } from "../interfaces/v1/extracted-data";
-import { ExcelRowData } from "../interfaces/excel-columns";
-import { EXCEL_COLUMNS } from "../config/excel-columns";
+import { ExtractedData } from "../../interfaces/v2/extracted-data";
+import { ExcelRowData } from "../../interfaces/excel-columns";
+import { EXCEL_COLUMNS } from "../../config/excel-columns";
 
 const AUTHOR = "Aldy Nugroho";
 
@@ -136,11 +136,8 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
 
   // Process data into a single row
   const rows: ExcelRowData[] = data.map((file, fileIndex) => {
-    const drawingDate =
-      file.data.find((d) => d.label === "Tanggal Drawing")?.strings[0] || "";
-
-    const formattedDrawingDate = drawingDate
-      ? new Date(drawingDate.split(/[-\/]/).reverse().join("-"))
+    const formattedDrawingDate = file.drawingDate
+      ? new Date(file.drawingDate.split(/[-\/]/).reverse().join("-"))
           .toLocaleDateString("en-GB", {
             day: "2-digit",
             month: "short",
@@ -151,34 +148,22 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
 
     const row: ExcelRowData = {
       no: fileIndex + 1,
-      project:
-        file.data.find((d) => d.label === "Proyek")?.strings.join(" ") || "",
-      drawingNo:
-        file.data.find((d) => d.label === "No Gambar")?.strings.join(" ") || "",
-      drawingName:
-        file.data.find((d) => d.label === "Nama Gambar")?.strings.join(" ") ||
-        "",
-      type: file.data.find((d) => d.label === "Type")?.strings.join("; ") || "",
-      size: file.data.find((d) => d.label === "Size")?.strings.join(" ") || "",
-      sheet:
-        file.data.find((d) => d.label === "Sheet")?.strings.join(" ") || "",
-      rev: file.data.find((d) => d.label === "Rev")?.strings.join(" ") || "",
+      project: "", // Currently not in ExtractedData interface
+      drawingNo: file.drawingNumber || "",
+      drawingName: file.title || "",
+      type: file.types?.join("; ") || "",
+      size: file.size || "",
+      sheet: file.sheets?.toString() || "",
+      rev: file.revision || "0",
       drawingDate: formattedDrawingDate,
-      releaseDate:
-        file.data
-          .find((d) => d.label === "Tanggal Release")
-          ?.strings.join(" ") || "",
-      drafter: file.data.find((d) => d.label === "Drafter")?.strings[0] || "",
-      checker: file.data.find((d) => d.label === "Checker")?.strings[0] || "",
-      approval: file.data.find((d) => d.label === "Approval")?.strings[0] || "",
-      welding: file.data.find((d) => d.label === "Welding")?.strings[0] || "",
-      integration:
-        file.data.find((d) => d.label === "Integration")?.strings[0] || "",
-      mechanicalSystem:
-        file.data.find((d) => d.label === "Mechanical System")?.strings[0] ||
-        "",
-      remarks:
-        file.data.find((d) => d.label === "Ket")?.strings.join(" ") || "",
+      releaseDate: "", // Currently not in ExtractedData interface
+      drafter: file.personnel.drafter || "",
+      checker: file.personnel.checker || "",
+      approval: file.personnel.approval || "",
+      welding: file.personnel.welding || "",
+      integration: file.personnel.integration || "",
+      mechanicalSystem: file.personnel.mechanical || "",
+      remarks: file.revisionInfo || "",
     };
     return row;
   });

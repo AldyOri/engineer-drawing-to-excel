@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
-import { ExtractedData } from "../interfaces/extracted-data";
+import { ExtractedData } from "../interfaces/v1/extracted-data";
 import { generateExcel } from "../services/exceljs-service";
 
 export class FileUtils {
@@ -18,10 +18,7 @@ export class FileUtils {
     outputsDir: string
   ): Promise<void> {
     const timestamp = new Date().toISOString().replace(/[:]/g, "-");
-    const debugFileName = `debug_${path.basename(
-      filePath,
-      ".pdf"
-    )}.json`;
+    const debugFileName = `debug_${path.basename(filePath, ".pdf")}.json`;
 
     await FileUtils.ensureDirectoryExists(outputsDir);
     await fs.writeFile(

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { OUTPUTS_DIR, UPLOADS_DIR } from "../constants/constants";
-import { FileUtils } from "../utils/file-utils";
+import { OUTPUTS_DIR_V1, UPLOADS_DIR_V1 } from "../../constants/constants";
+import { FileUtils } from "../../utils/file-utils";
 import path from "path";
 import { existsSync } from "fs";
 
@@ -9,7 +9,7 @@ export const downloadExcel = async (
   res: Response
 ): Promise<void> => {
   try {
-    const excelPath = path.join(OUTPUTS_DIR, "result.xlsx");
+    const excelPath = path.join(OUTPUTS_DIR_V1, "result.xlsx");
 
     if (!existsSync(excelPath)) {
       res.status(404).json({
@@ -34,8 +34,8 @@ export const downloadExcel = async (
       }
 
       try {
-        await FileUtils.clearDirectory(UPLOADS_DIR);
-        await FileUtils.clearDirectory(OUTPUTS_DIR);
+        await FileUtils.clearDirectory(UPLOADS_DIR_V1);
+        await FileUtils.clearDirectory(OUTPUTS_DIR_V1);
         console.log(
           "Cleared uploads and outputs directories after successful download"
         );

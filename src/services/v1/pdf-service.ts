@@ -1,10 +1,10 @@
 import { PDFExtract, PDFExtractOptions } from "pdf.js-extract";
-import { ExtractedData } from "../interfaces/extracted-data";
-import { FileUtils } from "../utils/file-utils";
+import { ExtractedData } from "../../interfaces/v1/extracted-data";
+import { FileUtils } from "../../utils/file-utils";
 import path from "path";
 import fs from "fs/promises";
-import { normalizePDF } from "../utils/pdf-utils";
-import { EXTRACTION_CONFIG, Zone } from "../config/extraction-config";
+import { normalizePDF } from "../../utils/v1/pdf-utils";
+import { EXTRACTION_CONFIG } from "../../config/extraction-config";
 
 export class PDFService {
   private pdfExtract: PDFExtract;
@@ -63,7 +63,7 @@ export class PDFService {
 
       const data = await this.pdfExtract.extract(tempFile, this.options);
       const origin = this.detectOrigin(data);
-      // await FileUtils.saveDebugData(data, filePath, outputsDir);
+      await FileUtils.saveDebugData(data, filePath, outputsDir);
 
       const extractedData = EXTRACTION_CONFIG.map((config) => {
         if (config.label === "Sheet") {

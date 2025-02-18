@@ -1,5 +1,4 @@
 import { ExcelColumn } from "../interfaces/excel-columns";
-import { Column } from "exceljs";
 
 export const EXCEL_COLUMNS: ExcelColumn[] = [
   { header: "No", key: "no", width: 5 },

@@ -28,7 +28,8 @@ export const EXTRACTION_CONFIG: ExtractionConfig[] = [
   },
   {
     label: "No Gambar",
-    pattern: /^\d{2,3}\.\d-[A-Z]\d{5}$/,
+    pattern:
+      /^(?:ASM_)?\d{2,3}(?:\.\d)?-[A-Z]\d{5}|(?:AP1-)?TB\d{4}-\d{2}\.\d-\d{3}$/,
     zones: [
       {
         xStart: 1191 * (3 / 4),

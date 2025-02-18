@@ -1,16 +1,16 @@
 import { Router } from "express";
 import multer from "multer";
-import { uploadFiles } from "../controllers/v1/uploadController";
-import { processFiles } from "../controllers/v1/processController";
-import { downloadExcel } from "../controllers/v1/downloadController";
 import path from "path";
-import { UPLOADS_DIR_V1 } from "../constants/constants";
+import { uploadFiles } from "../controllers/v2/uploadController";
+import { processFiles } from "../controllers/v2/processController";
+import { downloadExcel } from "../controllers/v2/downloadController";
+import { UPLOADS_DIR_V2 } from "../constants/constants";
 
-const router = Router();
+const routerV2 = Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, UPLOADS_DIR_V1);
+    cb(null, UPLOADS_DIR_V2);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
@@ -31,8 +31,8 @@ const upload = multer({
   },
 });
 
-router.post("/upload", upload.array("files"), uploadFiles);
-router.post("/process", processFiles);
-router.get("/download", downloadExcel);
+routerV2.post("/upload", upload.array("files"), uploadFiles);
+routerV2.post("/process", processFiles);
+routerV2.get("/download", downloadExcel);
 
-export default router;
+export default routerV2;
