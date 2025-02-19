@@ -1,5 +1,6 @@
 import {
   GoogleGenerativeAI,
+  InlineDataPart,
   ResponseSchema,
   SchemaType,
 } from "@google/generative-ai";
@@ -98,6 +99,12 @@ const resSchema: ResponseSchema = {
         description: "Revision information code (REV CONTENTS)",
         nullable: true,
       },
+      isCanceled: {
+        type: SchemaType.BOOLEAN,
+        description:
+          "The approval/cancelation status of the drawing, default is false, if the value is true, then the drawing is canceled",
+        nullable: false,
+      },
     },
   },
 };
@@ -114,7 +121,10 @@ export const model = genAI.getGenerativeModel({
   },
 });
 
-export function fileToGenerativePart(path: string, mimeType: string) {
+export function fileToGenerativePart(
+  path: string,
+  mimeType: string
+): InlineDataPart {
   return {
     inlineData: {
       data: Buffer.from(fs.readFileSync(path)).toString("base64"),

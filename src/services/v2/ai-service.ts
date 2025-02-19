@@ -20,7 +20,6 @@ async function processBatchConcurrently(batchFiles: string[]) {
     if (parts.length > 0) {
       const delimiterPart: TextPart = {
         text: DOCUMENT_DELIMITER,
-        // Remove inlineData since it's not needed for text parts
       };
       parts.push(delimiterPart);
     }
@@ -37,7 +36,6 @@ async function processBatchConcurrently(batchFiles: string[]) {
   // Add the prompt at the end
   const promptPart: TextPart = {
     text: AI_PROMPT,
-    // Remove inlineData since it's not needed for text parts
   };
   parts.push(promptPart);
 

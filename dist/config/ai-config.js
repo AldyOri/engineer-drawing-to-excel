@@ -95,6 +95,11 @@ const resSchema = {
                 description: "Revision information code (REV CONTENTS)",
                 nullable: true,
             },
+            isCanceled: {
+                type: generative_ai_1.SchemaType.BOOLEAN,
+                description: "The approval/cancelation status of the drawing, default is false, if the value is true, then the drawing is canceled",
+                nullable: false,
+            },
         },
     },
 };

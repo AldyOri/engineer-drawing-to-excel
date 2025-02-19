@@ -13,10 +13,15 @@ import {
 import fs from "fs/promises";
 import path from "path";
 
+// important pdf layers: ["0", "AM_0", "Border (ISO)", "Title (ISO)", "Hatch (ISO)"]
+
 interface PDFAnnotation {
   text: string;
   x: number;
   y: number;
+  width?: number;
+  height?: number;
+  type: string;
 }
 
 export class PDFUtils {
@@ -43,87 +48,114 @@ export class PDFUtils {
 
     for (const annot of annotArray) {
       try {
-        // Always try to resolve the reference first
-        let resolvedAnnot;
-        if (annot instanceof PDFRef) {
-          resolvedAnnot = page.doc.context.lookup(annot);
-          console.log("Resolved reference:", annot.toString());
-        } else {
-          resolvedAnnot = annot;
-        }
+        // Resolve annotation reference
+        let resolvedAnnot =
+          annot instanceof PDFRef ? page.doc.context.lookup(annot) : annot;
 
         if (!(resolvedAnnot instanceof PDFDict)) {
           console.log(
-            "Resolved annotation not in expected format:",
+            "Annotation not in expected format:",
             resolvedAnnot?.constructor.name
           );
           continue;
         }
 
-        // Get annotation properties with detailed logging
+        // Get annotation properties
         const contents = resolvedAnnot.lookup(PDFName.of("Contents"));
         const rect = resolvedAnnot.lookup(PDFName.of("Rect"));
         const subtype = resolvedAnnot.lookup(PDFName.of("Subtype"));
+        const appearance = resolvedAnnot.lookup(PDFName.of("AP"));
 
-        console.log("Annotation details:", {
-          subtype: subtype?.toString(),
-          hasContents: !!contents,
-          hasRect: !!rect,
-          rawContents: contents?.toString(),
-          rawRect: rect?.toString(),
-        });
-
-        // Try to get text content from various sources
         let textContent = "";
 
-        // Check Contents field first
-        if (contents instanceof PDFString) {
-          textContent = contents.asString();
+        // Handle different annotation types
+        if (subtype instanceof PDFName) {
+          const subtypeStr = subtype.toString();
+          console.log("Processing annotation type:", subtypeStr);
+
+          if (subtypeStr === "/Stamp") {
+            // For stamp annotations, try multiple sources for content
+            const stampSources = [
+              { key: "Contents", value: contents },
+              { key: "Name", value: resolvedAnnot.lookup(PDFName.of("Name")) },
+              { key: "T", value: resolvedAnnot.lookup(PDFName.of("T")) },
+              { key: "RC", value: resolvedAnnot.lookup(PDFName.of("RC")) },
+            ];
+
+            // Try each source until we find content
+            for (const source of stampSources) {
+              if (source.value instanceof PDFString) {
+                textContent = source.value.asString();
+                console.log(`Found stamp text in ${source.key}:`, textContent);
+                break;
+              }
+            }
+
+            // If no text found, try to get content from appearance stream
+            if (!textContent && appearance instanceof PDFDict) {
+              const normal = appearance.lookup(PDFName.of("N"));
+              if (normal instanceof PDFDict) {
+                const stream = normal.lookup(PDFName.of("Stream"));
+                if (stream) {
+                  textContent = `Stamp: ${normal.toString().substring(0, 50)}`;
+                  console.log("Using appearance stream for stamp content");
+                }
+              }
+            }
+          } else {
+            // Handle other annotation types
+            if (contents instanceof PDFString) {
+              textContent = contents.asString();
+            }
+          }
         }
 
-        // If no content found, try alternate fields
+        // If still no content, try alternate fields
         if (!textContent) {
-          // Expanded list of possible field names
-          const alternateFields = [
-            // "T", // Username org yang nulis comment (gaperlu)
-            "V",
-            "TU",
-            "TM", // Basic text fields
-            "Contents",
-            "RC", // Rich text and contents
-            "DS",
-            "CA", // Default style and appearance
-            "DA",
-            "AC", // Default appearance and action
-          ];
-
+          const alternateFields = ["V", "TU", "TM", "DS", "CA"];
           for (const field of alternateFields) {
             const value = resolvedAnnot.lookup(PDFName.of(field));
             if (value instanceof PDFString) {
               textContent = value.asString();
-              console.log(`Found text in field: ${field} = "${textContent}"`);
+              console.log(
+                `Found text in alternate field ${field}:`,
+                textContent
+              );
               break;
             }
           }
         }
 
-        if (!textContent) {
-          console.log("No text content found in resolved annotation");
-          continue;
-        }
-
-        // Parse coordinates
-        if (rect instanceof PDFArray) {
+        // Only proceed if we have both text content and valid coordinates
+        if (textContent && rect instanceof PDFArray) {
           const coords = rect.asArray();
           if (coords.length >= 4) {
-            // PDF coordinates: [llx, lly, urx, ury]
             const x = coords[0] instanceof PDFNumber ? coords[0].asNumber() : 0;
             const y = coords[1] instanceof PDFNumber ? coords[1].asNumber() : 0;
 
-            console.log(`Adding annotation: "${textContent}" at (${x},${y})`);
-            annotations.push({ text: textContent, x, y });
-          } else {
-            console.log("Invalid rectangle coordinates", coords);
+            // For stamps, also store the width and height
+            const width =
+              coords[2] instanceof PDFNumber
+                ? coords[2].asNumber() - x
+                : undefined;
+            const height =
+              coords[3] instanceof PDFNumber
+                ? coords[3].asNumber() - y
+                : undefined;
+
+            console.log(
+              `Adding annotation: "${textContent}" at (${x},${y})`,
+              width && height ? `size: ${width}x${height}` : ""
+            );
+
+            annotations.push({
+              text: textContent,
+              x,
+              y,
+              width,
+              height,
+              type: subtype?.toString() || "unknown",
+            });
           }
         }
       } catch (error) {
@@ -134,71 +166,6 @@ export class PDFUtils {
     console.log(`Successfully extracted ${annotations.length} annotations`);
     return annotations;
   }
-
-  // private static async writeDebugInfo(
-  //   filename: string,
-  //   data: any
-  // ): Promise<void> {
-  //   const debugDir = path.join("outputs", "v2", "debug");
-  //   const debugPath = path.join(debugDir, `${filename}.json`);
-
-  //   try {
-  //     await fs.mkdir(debugDir, { recursive: true });
-  //     await fs.writeFile(debugPath, JSON.stringify(data, null, 2));
-  //     console.log(`Debug info written to ${debugPath}`);
-  //   } catch (error) {
-  //     console.error("Failed to write debug info:", error);
-  //   }
-  // }
-
-  // private static async dumpPDFStructure(page: PDFPage): Promise<void> {
-  //   console.log("\nPDF Structure Analysis:");
-
-  //   const dict = page.node;
-  //   const debugData: any = {
-  //     timestamp: new Date().toISOString(),
-  //     pageKeys: Object.keys(dict),
-  //     annotations: [],
-  //   };
-
-  //   const annots = dict.lookup(PDFName.of("Annots"));
-  //   if (annots instanceof PDFArray) {
-  //     console.log("\nDetailed Annotation Analysis:");
-  //     const annotations = annots.asArray();
-
-  //     for (let i = 0; i < annotations.length; i++) {
-  //       const annot = annotations[i];
-  //       console.log(`\nAnnotation ${i + 1}:`);
-
-  //       const annotDebug: any = {
-  //         index: i + 1,
-  //         type: annot.constructor.name,
-  //         details: {},
-  //       };
-
-  //       if (annot instanceof PDFDict) {
-  //         const keys = Array.from(annot.keys()).map((k) => k.toString());
-  //         annotDebug.keys = keys;
-
-  //         keys.forEach((key) => {
-  //           const value = annot.lookup(PDFName.of(key));
-  //           annotDebug.details[key] = value?.toString() || null;
-  //         });
-  //       } else if (annot instanceof PDFRef) {
-  //         annotDebug.reference = annot.toString();
-  //         const resolved = page.doc.context.lookup(annot);
-  //         annotDebug.resolvedType = resolved?.constructor.name;
-  //       }
-
-  //       debugData.annotations.push(annotDebug);
-  //     }
-  //   }
-
-  //   // Write debug info to file
-  //   const filename = `pdf_structure_${Date.now()}`;
-  //   await this.writeDebugInfo(filename, debugData);
-  // }
-
   public static async createCroppedPDF(
     sourcePath: string,
     outputPath: string
@@ -323,10 +290,85 @@ export class PDFUtils {
     outputDir: string
   ): Promise<void> {
     try {
-      await this.processDirectory(inputDir, outputDir);
+      const files = await fs.readdir(inputDir);
+      const pdfFiles = files.filter((file) =>
+        file.toLowerCase().endsWith(".pdf")
+      );
+
+      for (const pdfFile of pdfFiles) {
+        const sourcePath = path.join(inputDir, pdfFile);
+        const outputPath = path.join(outputDir, `cropped_${pdfFile}`);
+        await this.createCroppedPDF(sourcePath, outputPath);
+      }
+
+      console.log(`Processed ${pdfFiles.length} PDF files`);
     } catch (error) {
-      console.error("Failed to process PDFs:", error);
+      console.error("Error processing PDFs:", error);
       throw error;
     }
   }
 }
+
+// private static async writeDebugInfo(
+//   filename: string,
+//   data: any
+// ): Promise<void> {
+//   const debugDir = path.join("outputs", "v2", "debug");
+//   const debugPath = path.join(debugDir, `${filename}.json`);
+
+//   try {
+//     await fs.mkdir(debugDir, { recursive: true });
+//     await fs.writeFile(debugPath, JSON.stringify(data, null, 2));
+//     console.log(`Debug info written to ${debugPath}`);
+//   } catch (error) {
+//     console.error("Failed to write debug info:", error);
+//   }
+// }
+
+// private static async dumpPDFStructure(page: PDFPage): Promise<void> {
+//   console.log("\nPDF Structure Analysis:");
+
+//   const dict = page.node;
+//   const debugData: any = {
+//     timestamp: new Date().toISOString(),
+//     pageKeys: Object.keys(dict),
+//     annotations: [],
+//   };
+
+//   const annots = dict.lookup(PDFName.of("Annots"));
+//   if (annots instanceof PDFArray) {
+//     console.log("\nDetailed Annotation Analysis:");
+//     const annotations = annots.asArray();
+
+//     for (let i = 0; i < annotations.length; i++) {
+//       const annot = annotations[i];
+//       console.log(`\nAnnotation ${i + 1}:`);
+
+//       const annotDebug: any = {
+//         index: i + 1,
+//         type: annot.constructor.name,
+//         details: {},
+//       };
+
+//       if (annot instanceof PDFDict) {
+//         const keys = Array.from(annot.keys()).map((k) => k.toString());
+//         annotDebug.keys = keys;
+
+//         keys.forEach((key) => {
+//           const value = annot.lookup(PDFName.of(key));
+//           annotDebug.details[key] = value?.toString() || null;
+//         });
+//       } else if (annot instanceof PDFRef) {
+//         annotDebug.reference = annot.toString();
+//         const resolved = page.doc.context.lookup(annot);
+//         annotDebug.resolvedType = resolved?.constructor.name;
+//       }
+
+//       debugData.annotations.push(annotDebug);
+//     }
+//   }
+
+//   // Write debug info to file
+//   const filename = `pdf_structure_${Date.now()}`;
+//   await this.writeDebugInfo(filename, debugData);
+// }

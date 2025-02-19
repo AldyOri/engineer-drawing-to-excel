@@ -1,9 +1,9 @@
 import path from "path";
 import fs from "fs";
 
-const PROJECT_ROOT = path.join(__dirname, "../../");
-
 export const PORT = 3000;
+
+const PROJECT_ROOT = path.join(__dirname, "../../");
 
 export const UPLOADS_DIR_V1 = path.join(PROJECT_ROOT, "uploads/v1");
 export const OUTPUTS_DIR_V1 = path.join(PROJECT_ROOT, "outputs/v1");
@@ -12,19 +12,19 @@ export const UPLOADS_DIR_V2 = path.join(PROJECT_ROOT, "uploads/v2");
 export const OUTPUTS_DIR_V2 = path.join(PROJECT_ROOT, "outputs/v2");
 
 export const DOCUMENT_DELIMITER =
-  "\n####<<<<====****DOCUMENT_BOUNDARY****====>>>>####\n";
+  "\n####<<<<====****DOCUMENT_BOUNDARY****====>>>>####\n".trim();
 
 export const AI_PROMPT = `
 IMPORTANT: Process each document independently.
 Documents are separated by the delimiter: "${DOCUMENT_DELIMITER}"
 
 CRITICAL RULES:
-1.  Use "${DOCUMENT_DELIMITER}" to identify document boundaries (Define the document scope)
-2.  Process each document independently (Enforce core processing principle)
-3.  Never mix information between documents (Reinforce independent processing)
-4.  Return null for any field not found or invalid (Handle missing/invalid data gracefully)
+1. Use "${DOCUMENT_DELIMITER}" to identify document boundaries (Define the document scope)
+2. Process each document independently (Enforce core processing principle)
+3. Never mix information between documents (Reinforce independent processing)
+4. Return null for any field not found or invalid (Handle missing/invalid data gracefully)
 5. Follow exact field names and data types (Schema compliance)
-6. Complete all of the data from source
+6. Complete all of the data from source (Extracted data)
 
 For each document between delimiters:
 
@@ -104,14 +104,16 @@ A7. Drawing Date
 SECTION B: Personnel Information
 ----------------------------
 B1. Drafter
-    - Look ONLY in "DRAWN BY" field
-    - Usually 2-3 letter codes (e.g., SDH, JAP, ACK, etc.)
-    - Return exact case as shown
+    - Look ONLY in "DRAWN BY" field.
+    - DO NOT extract from "INITIAL", "CHECKED BY", "REVISED BY", "APPROVED BY" field.
+    - Usually 2-3 letter codes (e.g., SDH, JAP, ACK, etc.).
+    - Return exact case as shown.
 
 B2. Checker
-    - Look ONLY in "CHECKED BY" field
-    - Usually 2-3 letter codes (e.g., TRP, AES, CHR, etc.)
-    - Return exact case as shown
+    - Look ONLY in "CHECKED BY" field.
+    - DO NOT extract from "INITIAL", "DRAWN BY", "REVISED BY", "APPROVED BY" field.
+    - Usually 2-3 letter codes (e.g., TRP, AES, CHR, etc.).
+    - Return exact case as shown.
 
 B3. Approver
     - Look ONLY within the cell explicitly labeled "APPROVED BY :". Refer to the **document** for the exact visual layout of the title block.
@@ -121,13 +123,14 @@ B3. Approver
     - If the "APPROVED BY :" cell is empty, illegible, or the expected code cannot be identified, return null.
 
 B4. Integration
-    - Look ONLY in "INITIAL" field
-    - Common location: Left side of main table
-    - Usually 2-3 letter codes (e.g., LGA, SSR, etc.)
-    - Return null if not found
+    - Look ONLY in "INITIAL" field.
+    - DO NOT extract from "DRAWN BY", "CHECKED BY", "REVISED BY", "APPROVED BY" field.
+    - Common location: Left side of main table.
+    - Usually 2-3 letter codes (e.g., LGA, SSR, etc.).
+    - Return null if not found.
 
 B5-B6. Welding & Mechanical
-    - Always return null (not used)
+    - Always return null (not used).
 
 SECTION C: Additional Information
 -----------------------------
@@ -143,10 +146,20 @@ C1. Revision Info Code
       * Must exist if Revision is A-Z (not 0)
       * Must be null if Revision Code is null
       * Return exact format with slashes
+
+C2. isCanceled
+    - Look for a clear and prominent visual indication that the drawing has been cancelled.
+    - Keywords to look for: "CANCELLED", "CANCELED", "VOID", "SUPERSEDED".
+    - If any of these keywords (or visually similar indicators) are found prominently displayed on the document (e.g., stamped across the drawing), set isCanceled to true.
+    - If there is no clear indication of cancelation, or the document explicitly states that it is still active, set isCanceled to false.
+    - If it is found in the watermarks of the document, set to true.
+    - Default value: false.
 `.trim();
 
-// Notes location :
+// To Do:
+// incrase accuracy for 5 docs each batch, especially in "type", "rev", "drafter"
 
+// Notes location :
 // drawing date : approved by
 // drafter : drawn by
 // checker : checked by (bawah)
@@ -154,6 +167,10 @@ C1. Revision Info Code
 // welding : kosong
 // integration : initial (bisa kosong)
 // mechanical system : kosong
+
+// Notes tambahan jika canceled:
+// jika cancel NAMA_GAMBAR_CANCELED
+// ket. ganti nomer cancelation
 
 [UPLOADS_DIR_V1, OUTPUTS_DIR_V1, UPLOADS_DIR_V2, OUTPUTS_DIR_V2].forEach(
   (dir) => {

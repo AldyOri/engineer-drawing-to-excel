@@ -29,22 +29,22 @@ export const processFiles = async (
       path.join(UPLOADS_DIR_V2, "cropped")
     );
 
-    // Then process with AI
-    const extractedData = await askAi();
+    // // Then process with AI
+    // const extractedData = await askAi();
 
-    // Generate Excel file
-    const excelBuffer = await generateExcel(extractedData);
+    // // Generate Excel file
+    // const excelBuffer = await generateExcel(extractedData);
 
-    // Save Excel file
-    // const excelPath = path.join(OUTPUTS_DIR_V2, `processed_drawings_${new Date().toISOString().split('T')[0]}.xlsx`);
-    const excelPath = path.join(OUTPUTS_DIR_V2, `result.xlsx`);
-    await fs.promises.writeFile(excelPath, excelBuffer);
+    // // Save Excel file
+    // // const excelPath = path.join(OUTPUTS_DIR_V2, `processed_drawings_${new Date().toISOString().split('T')[0]}.xlsx`);
+    // const excelPath = path.join(OUTPUTS_DIR_V2, `result.xlsx`);
+    // await fs.promises.writeFile(excelPath, excelBuffer);
 
     res.status(200).json({
       message: "Files processed successfully",
       outputPath: OUTPUTS_DIR_V2,
       jsonPath: path.join(OUTPUTS_DIR_V2, "extractedData.json"),
-      excelPath: excelPath,
+      // excelPath: excelPath,
       //   extractedData,
     });
   } catch (error) {

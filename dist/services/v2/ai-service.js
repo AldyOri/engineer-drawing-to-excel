@@ -17,7 +17,6 @@ async function processBatchConcurrently(batchFiles) {
         if (parts.length > 0) {
             const delimiterPart = {
                 text: constants_1.DOCUMENT_DELIMITER,
-                // Remove inlineData since it's not needed for text parts
             };
             parts.push(delimiterPart);
         }
@@ -27,7 +26,6 @@ async function processBatchConcurrently(batchFiles) {
     // Add the prompt at the end
     const promptPart = {
         text: constants_1.AI_PROMPT,
-        // Remove inlineData since it's not needed for text parts
     };
     parts.push(promptPart);
     const result = await ai_config_1.model.generateContent(parts);
