@@ -29,12 +29,12 @@ const resSchema: ResponseSchema = {
       types: {
         type: SchemaType.ARRAY,
         description:
-          "Array of valid TYPE codes extracted from the 'TYPE' column in the title block.  Refer to the document for the visual layout.",
+          "Array of valid TYPE codes extracted EXCLUSIVELY from the 'TYPE' column in the title block. Only include recognized codes.",
         nullable: true,
         items: {
           type: SchemaType.STRING,
           description:
-            "A valid TYPE code extracted from the 'TYPE' column.  Must match a defined valid pattern.",
+            "A valid TYPE code extracted from the 'TYPE' column. Must match a defined valid pattern.",
           nullable: true,
         },
       },
@@ -104,6 +104,12 @@ const resSchema: ResponseSchema = {
         description:
           "The approval/cancelation status of the drawing, default is false, if the value is true, then the drawing is canceled",
         nullable: false,
+      },
+      cancelationCode: {
+        type: SchemaType.STRING,
+        description:
+          "The cancelation code of the drawing, if isCanceled false, the value should be null",
+        nullable: true,
       },
     },
   },

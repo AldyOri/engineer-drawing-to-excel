@@ -26,8 +26,8 @@ async function processBatchConcurrently(batchFiles: string[]) {
 
     // Add the PDF document
     parts.push(
-      await fileToGenerativePart(
-        path.join(UPLOADS_DIR_V2, "cropped", file),
+      fileToGenerativePart(
+        path.join(UPLOADS_DIR_V2, "copy", file),
         "application/pdf"
       )
     );
@@ -65,7 +65,7 @@ export async function askAi() {
   const startTime = performance.now();
 
   const files = fs
-    .readdirSync(path.join(UPLOADS_DIR_V2, "cropped"))
+    .readdirSync(path.join(UPLOADS_DIR_V2, "copy"))
     .filter((file) => file.endsWith(".pdf"));
 
   console.log(`Total files to process: ${files.length}`);
