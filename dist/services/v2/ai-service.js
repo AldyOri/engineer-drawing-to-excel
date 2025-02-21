@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.askAi = askAi;
+exports.askAi = void 0;
 const constants_1 = require("../../constants/constants");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -65,3 +65,4 @@ async function askAi() {
         throw error;
     }
 }
+exports.askAi = askAi;
