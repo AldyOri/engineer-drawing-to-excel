@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.askAi = void 0;
+exports.askAi = askAi;
 const constants_1 = require("../../constants/constants");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -21,7 +21,7 @@ async function processBatchConcurrently(batchFiles) {
             parts.push(delimiterPart);
         }
         // Add the PDF document
-        parts.push(await (0, ai_config_1.fileToGenerativePart)(path_1.default.join(constants_1.UPLOADS_DIR_V2, "cropped", file), "application/pdf"));
+        parts.push((0, ai_config_1.fileToGenerativePart)(path_1.default.join(constants_1.UPLOADS_DIR_V2, "copy", file), "application/pdf"));
     }
     // Add the prompt at the end
     const promptPart = {
@@ -45,7 +45,7 @@ async function processAllBatches(files, batchSize = 5) {
 async function askAi() {
     const startTime = performance.now();
     const files = fs_1.default
-        .readdirSync(path_1.default.join(constants_1.UPLOADS_DIR_V2, "cropped"))
+        .readdirSync(path_1.default.join(constants_1.UPLOADS_DIR_V2, "copy"))
         .filter((file) => file.endsWith(".pdf"));
     console.log(`Total files to process: ${files.length}`);
     try {
@@ -65,4 +65,3 @@ async function askAi() {
         throw error;
     }
 }
-exports.askAi = askAi;

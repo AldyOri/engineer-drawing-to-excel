@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateExcel = void 0;
+exports.generateExcel = generateExcel;
 const exceljs_1 = require("exceljs");
 const node_buffer_1 = require("node:buffer");
 const excel_columns_1 = require("../../config/excel-columns");
@@ -164,4 +164,3 @@ async function generateExcel(data) {
     const buffer = await workbook.xlsx.writeBuffer();
     return node_buffer_1.Buffer.from(buffer);
 }
-exports.generateExcel = generateExcel;

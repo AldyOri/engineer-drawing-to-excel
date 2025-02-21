@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AI_PROMPT = exports.DOCUMENT_DELIMITER = exports.OUTPUTS_DIR_V2 = exports.UPLOADS_DIR_V2 = exports.OUTPUTS_DIR_V1 = exports.UPLOADS_DIR_V1 = exports.PORT = void 0;
+exports.AI_PROMPT = exports.DOCUMENT_DELIMITER = exports.OUTPUTS_DIR_V2 = exports.UPLOADS_DIR_V2 = exports.OUTPUTS_DIR_V1 = exports.UPLOADS_DIR_V1 = exports.PROJECT_ROOT = exports.PORT = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const PROJECT_ROOT = path_1.default.join(__dirname, "../../");
 exports.PORT = 3000;
-exports.UPLOADS_DIR_V1 = path_1.default.join(PROJECT_ROOT, "uploads/v1");
-exports.OUTPUTS_DIR_V1 = path_1.default.join(PROJECT_ROOT, "outputs/v1");
-exports.UPLOADS_DIR_V2 = path_1.default.join(PROJECT_ROOT, "uploads/v2");
-exports.OUTPUTS_DIR_V2 = path_1.default.join(PROJECT_ROOT, "outputs/v2");
+exports.PROJECT_ROOT = path_1.default.join(__dirname, "../../");
+exports.UPLOADS_DIR_V1 = path_1.default.join(exports.PROJECT_ROOT, "uploads/v1");
+exports.OUTPUTS_DIR_V1 = path_1.default.join(exports.PROJECT_ROOT, "outputs/v1");
+exports.UPLOADS_DIR_V2 = path_1.default.join(exports.PROJECT_ROOT, "uploads/v2");
+exports.OUTPUTS_DIR_V2 = path_1.default.join(exports.PROJECT_ROOT, "outputs/v2");
 exports.DOCUMENT_DELIMITER = "\n####<<<<====****DOCUMENT_BOUNDARY****====>>>>####\n".trim();
 exports.AI_PROMPT = `
 IMPORTANT: Process each document independently.
@@ -54,21 +54,20 @@ A2. Title
     
 A3. Type Code - CRITICAL INSTRUCTIONS
     LOCATION:
-    - Focus your search within the title block in the vicinity of the column labeled "TYPE". Refer to the document for the specific visual layout of the title block to identify the precise location of the "TYPE" column.
-    - The "TYPE" codes are typically located directly beneath the "TYPE" label, within their respective cells.
-    - DO NOT extract codes from areas labeled "NO", "ORDER", "STANDARD", or any other labels besides "TYPE".
-    - DO NOT extract codes from the drawing title if TYPE code has already been found in its respective column.
+    - Look ONLY within the column labeled "TYPE" Codes are directly above the "TYPE" label, in their cells.
 
     VALIDATION:
-    - Extract ALL types found in the "TYPE" column of the title block.
-    - If an invalid code is extracted in the list, continue extraction.
-    - Use this VALID TYPE CODES as examples to determine validity:  T, M, TC, MC, KU, KRL, TB , T1, T2, TC1, TC2, T1', TC', KU Jabo, EMU-R, VM-KU, 612
-    - DO NOT extract codes from the title since the codes from TYPE column are more reliable
-    - DO NOT include invalid codes like "KCI". Ensure that each extracted code matches one of the VALID PATTERNS.
-    - Preserve exact case and formatting.
-    - Remove any leading or trailing whitespace from each extracted code.
-    - Return an empty array [] if no valid types are found in the "TYPE" column.
-    - If the same valid type code appears multiple times, return only one instance of the code.
+    - Extract ALL valid codes found in the "TYPE" column.
+    - Valid codes ARE: T, M, TC, MC, KU, KRL, TB, T1, T2, TC1, TC2, T1', TC', KU Jabo, EMU-R, VM-KU, 612.
+    - If NO valid codes are found in the "TYPE" column, return an empty array ([]).
+    - If same valid code appears multiple times, return only one.
+
+    REJECT:
+    - DO NOT extract anything from the drawing title.
+    - DO NOT extract invalid codes (e.g., KCI, STANDARD).
+    - DO NOT extract from "NO", "ORDER", "STANDARD", or "DESCRIPTION" columns.
+    - Remove any leading or trailing whitespace in the code name
+    - Preserve exact case and formatting within each extracted code.
 
 A4. Drawing Size
     - Format: ONLY A1, A2, A3, or A4
@@ -77,7 +76,7 @@ A4. Drawing Size
     - Return null if not matching format
 
 A5. Total Sheets
-    - Look for "SHEET" or "NO OF SHEET" field with format "X OF Y"
+    - Look only for "SHEET" field with format "X OF Y"
     - Return Y (total number) as integer
     - Example: "1 OF 6" → return 6
     - Must match total shown in field
@@ -99,6 +98,9 @@ A7. Drawing Date
     - Do not modify date format
     - Examples: "28/11/2024", "13-01-2025"
     - Return null if not found or invalid format
+    - If MULTIPLE valid dates are found:
+        * Compare the dates to determine the MOST RECENT date.
+        * Return the MOST RECENT date in the original format it was found.
 
 SECTION B: Personnel Information
 ----------------------------
@@ -122,11 +124,15 @@ B3. Approver
     - If the "APPROVED BY :" cell is empty, illegible, or the expected code cannot be identified, return null.
 
 B4. Integration
-    - Look ONLY in "INITIAL" field.
-    - DO NOT extract from "DRAWN BY", "CHECKED BY", "REVISED BY", "APPROVED BY" field.
-    - Common location: Left side of main table.
-    - Usually 2-3 letter codes (e.g., LGA, SSR, etc.).
-    - Return null if not found.
+    - Look EXCLUSIVELY in the "INITIAL" field.
+    - Refine your search by Focusing on the Left side of the main table.
+    - If no value is found in "INITIAL" then it MUST return null.
+
+    VALIDATION:
+        - In This extract make sure that you only extract if the data matches to “Usually 2-3 letter codes" such as LGA, SSR, etc.
+        - Do NOT extract ANY TEXT such as "DRAWN BY", "CHECKED BY", "REVISED BY", "APPROVED BY", "NO", "ORDER", "TYPE", "STANDARD", "KCI" or ANY OTHER DATA unrelated to the integration code.
+        - In case of error then return null as before, we prioritize following the extraction rules and instructions
+    Return null if not found.
 
 B5-B6. Welding & Mechanical
     - Always return null (not used).
@@ -153,6 +159,15 @@ C2. isCanceled
     - If there is no clear indication of cancelation, or the document explicitly states that it is still active, set isCanceled to false.
     - If it is found in the watermarks of the document, set to true.
     - Default value: false.
+
+C3. Cancelation Code
+    - This is a CONDITIONAL field. It should ONLY be extracted if isCanceled is "true". If isCanceled is "false", return null.
+    - If isCanceled is "true", look for a code or reference near the "CANCELLED" stamp or the keywords used to identify the cancellation, that tells more info for the reason.
+    - Valid examples for code include:
+        *”DCR KA/BWD/73/2024”
+    - Extract ONLY this part: KA/BWD/73/2024. 
+    - Preserve exact case and formatting from the source for the "CODE" field if it is available. If not the the text around the "CANCELLED" or "CANCELED".
+    - If no specific code is found return an empty string ("").
 `.trim();
 // To Do:
 // incrase accuracy for 5 docs each batch, especially in "type", "rev", "drafter"

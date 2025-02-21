@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizePDF = void 0;
+exports.normalizePDF = normalizePDF;
 const pdf_lib_1 = require("pdf-lib");
 const promises_1 = __importDefault(require("fs/promises"));
 const REFERENCE_DIMENSIONS = {
@@ -33,4 +33,3 @@ async function normalizePDF(filePath) {
     const pdfBytes = await pdfDoc.save();
     return Buffer.from(pdfBytes);
 }
-exports.normalizePDF = normalizePDF;

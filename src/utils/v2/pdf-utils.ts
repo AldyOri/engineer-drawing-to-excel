@@ -1,10 +1,7 @@
-import { PDFDocument } from "pdf-lib";
 import { spawn } from "node:child_process";
 import fs from "fs/promises";
 import path from "path";
 import { PROJECT_ROOT } from "../../constants/constants";
-
-// important pdf layers: ["0", "AM_0", "Border (ISO)", "Title (ISO)", "Hatch (ISO)"]
 
 export class PDFUtils {
   private static async processWithPython(
@@ -18,7 +15,7 @@ export class PDFUtils {
 
       // Collect stdout
       process.stdout.on("data", (data) => {
-        console.log(`Python output: ${data}`);
+        console.log(`Python output:\n ${data}`);
       });
 
       // Collect stderr
@@ -37,7 +34,7 @@ export class PDFUtils {
     });
   }
 
-  public static async createCroppedPDF(
+  public static async createCopyPDF(
     sourcePath: string,
     outputPath: string
   ): Promise<void> {
@@ -69,7 +66,7 @@ export class PDFUtils {
       for (const pdfFile of pdfFiles) {
         const sourcePath = path.join(inputDir, pdfFile);
         const outputPath = path.join(outputDir, `copyof_${pdfFile}`);
-        await this.createCroppedPDF(sourcePath, outputPath);
+        await this.createCopyPDF(sourcePath, outputPath);
       }
 
       console.log(`Processed ${pdfFiles.length} PDF files`);

@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fileToGenerativePart = exports.model = exports.genAI = void 0;
+exports.model = exports.genAI = void 0;
+exports.fileToGenerativePart = fileToGenerativePart;
 const generative_ai_1 = require("@google/generative-ai");
 require("dotenv/config");
 const fs_1 = __importDefault(require("fs"));
@@ -26,11 +27,11 @@ const resSchema = {
             },
             types: {
                 type: generative_ai_1.SchemaType.ARRAY,
-                description: "Array of valid TYPE codes extracted from the 'TYPE' column in the title block.  Refer to the document for the visual layout.",
+                description: "Array of valid TYPE codes extracted EXCLUSIVELY from the 'TYPE' column in the title block. Only include recognized codes.",
                 nullable: true,
                 items: {
                     type: generative_ai_1.SchemaType.STRING,
-                    description: "A valid TYPE code extracted from the 'TYPE' column.  Must match a defined valid pattern.",
+                    description: "A valid TYPE code extracted from the 'TYPE' column. Must match a defined valid pattern.",
                     nullable: true,
                 },
             },
@@ -100,6 +101,11 @@ const resSchema = {
                 description: "The approval/cancelation status of the drawing, default is false, if the value is true, then the drawing is canceled",
                 nullable: false,
             },
+            cancelationCode: {
+                type: generative_ai_1.SchemaType.STRING,
+                description: "The cancelation code of the drawing, if isCanceled false, the value should be null",
+                nullable: true,
+            },
         },
     },
 };
@@ -122,4 +128,3 @@ function fileToGenerativePart(path, mimeType) {
         },
     };
 }
-exports.fileToGenerativePart = fileToGenerativePart;

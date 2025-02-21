@@ -22,7 +22,7 @@ const processFiles = async (req, res) => {
             return;
         }
         // First crop the PDFs
-        await pdf_utils_1.PDFUtils.processPDFs(constants_1.UPLOADS_DIR_V2, path_1.default.join(constants_1.UPLOADS_DIR_V2, "cropped"));
+        await pdf_utils_1.PDFUtils.processPDFs(constants_1.UPLOADS_DIR_V2, path_1.default.join(constants_1.UPLOADS_DIR_V2, "copy"));
         // Then process with AI
         const extractedData = await (0, ai_service_1.askAi)();
         // Generate Excel file
