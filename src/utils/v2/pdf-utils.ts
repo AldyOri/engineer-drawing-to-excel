@@ -15,7 +15,7 @@ export class PDFUtils {
 
       // Collect stdout
       process.stdout.on("data", (data) => {
-        console.log(`Python output:\n ${data}`);
+        console.log(`Python output:\n${data}`);
       });
 
       // Collect stderr

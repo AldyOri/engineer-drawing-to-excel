@@ -1,8 +1,8 @@
 import { Workbook } from "exceljs";
 import { Buffer } from "node:buffer";
-import { ExtractedData } from "../interfaces/v1/extracted-data";
-import { ExcelRowData } from "../interfaces/excel-columns";
-import { EXCEL_COLUMNS } from "../config/excel-columns";
+import { ExtractedData } from "../../interfaces/v1/extracted-data";
+import { ExcelRowData } from "../../interfaces/excel-columns";
+import { EXCEL_COLUMNS } from "../../config/excel-columns";
 
 const AUTHOR = "Aldy Nugroho";
 

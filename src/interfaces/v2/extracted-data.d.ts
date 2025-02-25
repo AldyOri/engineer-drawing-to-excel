@@ -13,10 +13,12 @@ export interface ExtractedData {
   types: string[] | null;
   size: string | null;
   sheets: number | null;
-  revision: string;  // Not null because default is "0"
+  revision: string | null;
   drawingDate: string | null;
   personnel: Personnel;
   revisionInfo: string | null;
+  isCanceled: boolean;
+  cancelationCode: string | null;
 }
 
-export { ExtractedData, DataItem };
+export { ExtractedData };

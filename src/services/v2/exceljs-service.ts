@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import { ExtractedData } from "../../interfaces/v2/extracted-data";
 import { ExcelRowData } from "../../interfaces/excel-columns";
 import { EXCEL_COLUMNS } from "../../config/excel-columns";
+import { JSONUtils } from "../../utils/v2/json-utils";
 
 const AUTHOR = "Aldy Nugroho";
 
@@ -134,8 +135,11 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
     };
   });
 
+  // remove duplicates (if exist)
+  const processedData = JSONUtils.removeDuplicates(data);
+
   // Process data into a single row
-  const rows: ExcelRowData[] = data.map((file, fileIndex) => {
+  const rows: ExcelRowData[] = processedData.map((file, fileIndex) => {
     const formattedDrawingDate = file.drawingDate
       ? new Date(file.drawingDate.split(/[-\/]/).reverse().join("-"))
           .toLocaleDateString("en-GB", {
@@ -150,7 +154,7 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
       no: fileIndex + 1,
       project: "", // Currently not in ExtractedData interface
       drawingNo: file.drawingNumber || "",
-      drawingName: file.title || "",
+      drawingName: `${file.title}${file.isCanceled ? "_CANCELED" : ""}` || "",
       type: file.types?.join("; ") || "",
       size: file.size || "",
       sheet: file.sheets?.toString() || "",
@@ -163,7 +167,9 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
       welding: file.personnel.welding || "",
       integration: file.personnel.integration || "",
       mechanicalSystem: file.personnel.mechanical || "",
-      remarks: file.revisionInfo || "",
+      remarks: file.isCanceled
+        ? file.cancelationCode || ""
+        : file.revisionInfo || "",
     };
     return row;
   });

@@ -13,7 +13,19 @@ const resSchema: ResponseSchema = {
   type: SchemaType.ARRAY,
   items: {
     type: SchemaType.OBJECT,
-    required: ["drawingNumber"],
+    required: [
+      "drawingNumber",
+      "title",
+      "types",
+      "size",
+      "sheets",
+      "revision",
+      "drawingDate",
+      "personnel",
+      "revisionInfo",
+      "isCanceled",
+      "cancelationCode",
+    ],
     properties: {
       drawingNumber: {
         type: SchemaType.STRING,
@@ -31,6 +43,7 @@ const resSchema: ResponseSchema = {
         description:
           "Array of valid TYPE codes extracted EXCLUSIVELY from the 'TYPE' column in the title block. Only include recognized codes.",
         nullable: true,
+        required: ["type"],
         items: {
           type: SchemaType.STRING,
           description:
@@ -61,6 +74,14 @@ const resSchema: ResponseSchema = {
       personnel: {
         type: SchemaType.OBJECT,
         description: "Personnel involved in the drawing",
+        required: [
+          "drafter",
+          "checker",
+          "approval",
+          "welding",
+          "integration",
+          "mechanical",
+        ],
         properties: {
           drafter: {
             type: SchemaType.STRING,

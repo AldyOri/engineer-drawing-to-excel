@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
 import { ExtractedData } from "../interfaces/v1/extracted-data";
-import { generateExcel } from "../services/exceljs-service";
+import { generateExcel } from "../services/v1/exceljs-service";
 
 export class FileUtils {
   static async getPDFFiles(directory: string): Promise<string[]> {
