@@ -40,8 +40,8 @@ export const downloadExcel = async (
 
     // Clean up after successful download
     try {
-    //   await FileUtils.clearDirectory(UPLOADS_DIR_V2);
-    //   await FileUtils.clearDirectory(OUTPUTS_DIR_V2);
+      await FileUtils.clearDirectory(UPLOADS_DIR_V2);
+      await FileUtils.clearDirectory(OUTPUTS_DIR_V2);
       console.log(
         "Cleared uploads and outputs directories after successful download"
       );

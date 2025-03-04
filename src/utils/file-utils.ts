@@ -47,7 +47,22 @@ export class FileUtils {
     if (!existsSync(dirPath)) return;
 
     const files = await fs.readdir(dirPath);
-    await Promise.all(files.map((file) => fs.unlink(path.join(dirPath, file))));
+
+    for (const file of files) {
+      const filePath = path.join(dirPath, file);
+      const stats = await fs.stat(filePath);
+
+      if (stats.isDirectory()) {
+        // First recursively clear the subdirectory
+        await this.clearDirectory(filePath);
+        // Then remove the empty directory
+        await fs.rmdir(filePath);
+      } else {
+        // Remove file
+        await fs.unlink(filePath);
+      }
+    }
+
     console.log(`Cleared directory: ${dirPath}`);
   }
 
