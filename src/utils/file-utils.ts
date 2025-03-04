@@ -46,24 +46,45 @@ export class FileUtils {
   static async clearDirectory(dirPath: string): Promise<void> {
     if (!existsSync(dirPath)) return;
 
-    const files = await fs.readdir(dirPath);
+    try {
+      const files = await fs.readdir(dirPath);
 
-    for (const file of files) {
-      const filePath = path.join(dirPath, file);
-      const stats = await fs.stat(filePath);
+      for (const file of files) {
+        const filePath = path.join(dirPath, file);
 
-      if (stats.isDirectory()) {
-        // First recursively clear the subdirectory
-        await this.clearDirectory(filePath);
-        // Then remove the empty directory
-        await fs.rmdir(filePath);
-      } else {
-        // Remove file
-        await fs.unlink(filePath);
+        try {
+          const stats = await fs.stat(filePath);
+
+          if (stats.isDirectory()) {
+            // First recursively clear the subdirectory
+            await this.clearDirectory(filePath);
+            // Then remove the empty directory
+            try {
+              await fs.rmdir(filePath);
+            } catch (rmdirError: any) {
+              console.warn(
+                `Could not remove directory ${filePath}: ${rmdirError.message}`
+              );
+            }
+          } else {
+            // Remove file
+            try {
+              await fs.unlink(filePath);
+            } catch (unlinkError: any) {
+              console.warn(
+                `Could not delete file ${filePath}: ${unlinkError.message}`
+              );
+            }
+          }
+        } catch (statError: any) {
+          console.warn(`Could not access ${filePath}: ${statError.message}`);
+        }
       }
-    }
 
-    console.log(`Cleared directory: ${dirPath}`);
+      console.log(`Cleared directory: ${dirPath}`);
+    } catch (error: any) {
+      console.error(`Error clearing directory ${dirPath}: ${error.message}`);
+    }
   }
 
   private static async ensureDirectoryExists(dirPath: string): Promise<void> {
