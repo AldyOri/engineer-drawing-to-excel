@@ -43,7 +43,6 @@ const resSchema: ResponseSchema = {
         description:
           "Array of valid TYPE codes extracted EXCLUSIVELY from the 'TYPE' column in the title block. Only include recognized codes.",
         nullable: true,
-        required: ["type"],
         items: {
           type: SchemaType.STRING,
           description:
