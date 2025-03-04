@@ -14,6 +14,7 @@ const resSchema: ResponseSchema = {
   items: {
     type: SchemaType.OBJECT,
     required: [
+      "projectName",
       "drawingNumber",
       "title",
       "types",
@@ -27,6 +28,11 @@ const resSchema: ResponseSchema = {
       "cancelationCode",
     ],
     properties: {
+      projectName: {
+        type: SchemaType.STRING,
+        description: "Always null",
+        nullable: true,
+      },
       drawingNumber: {
         type: SchemaType.STRING,
         description: "Drawing number found in the document (DRAWING NO)",

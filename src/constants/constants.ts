@@ -91,7 +91,7 @@ A6. Revision Code - (revision)
       * "0" or "O" -> return null
       * Empty/not found -> return null 
 
-A7. Drawing Date - (drawing date)
+A7. Drawing Date - (drawingDate)
     - Look ONLY in "APPROVED" or "APPROVED BY" field
     - Valid formats: DD/MM/YYYY or DD-MM-YYYY
     - Match exact date shown
@@ -101,6 +101,9 @@ A7. Drawing Date - (drawing date)
     - If MULTIPLE valid dates are found:
         * Compare the dates to determine the MOST RECENT date.
         * Return the MOST RECENT date in the original format it was found.
+
+A8. Project Name - (projectName)
+    - Always return null (not used).
 
 SECTION B: Personnel Information
 ----------------------------

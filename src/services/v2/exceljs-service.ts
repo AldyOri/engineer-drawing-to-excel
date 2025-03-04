@@ -152,7 +152,7 @@ export async function generateExcel(data: ExtractedData[]): Promise<Buffer> {
 
     const row: ExcelRowData = {
       no: fileIndex + 1,
-      project: "", // Currently not in ExtractedData interface
+      project: file.projectName || "",
       drawingNo: file.drawingNumber || "",
       drawingName: `${file.title}${file.isCanceled ? "_CANCELED" : ""}` || "",
       type: file.types?.join("; ") || "",

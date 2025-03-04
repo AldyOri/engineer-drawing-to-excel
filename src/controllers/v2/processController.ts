@@ -5,6 +5,7 @@ import path from "path";
 import { PDFUtils } from "../../utils/v2/pdf-utils";
 import { askAi } from "../../services/v2/ai-service";
 import { generateExcel } from "../../services/v2/exceljs-service";
+import { ProjectUtils } from "../../utils/v2/project-utils";
 
 export const processFiles = async (
   req: Request,
@@ -30,7 +31,9 @@ export const processFiles = async (
     );
 
     // Then process with AI
-    const extractedData = await askAi();
+    let extractedData = await askAi();
+
+    extractedData = await ProjectUtils.enrichWithProjectNames(extractedData);
 
     // Generate Excel file
     const excelBuffer = await generateExcel(extractedData);
@@ -45,7 +48,7 @@ export const processFiles = async (
       outputPath: OUTPUTS_DIR_V2,
       jsonPath: path.join(OUTPUTS_DIR_V2, "extractedData.json"),
       excelPath: excelPath,
-      //   extractedData,
+      // extractedData,
     });
   } catch (error) {
     console.error("Error processing files:", error);

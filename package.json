@@ -4,14 +4,17 @@
   "description": "web based app that scrape data from engineer drawing and map it into an excel file",
   "main": "dist/app.js",
   "scripts": {
+    "clean": "node -e \"require('fs-extra').emptyDirSync('./dist')\"",
+    "prebuild": "npm run clean",
+    "build": "tsc",
     "start": "node dist/app.js",
-    "dev": "nodemon src/app.ts",
-    "build": "tsc"
+    "dev": "nodemon src/app.ts"
   },
   "author": "Aldy Nugroho",
   "license": "ISC",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "axios": "^1.8.1",
     "canvas": "^3.1.0",
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",
@@ -24,9 +27,11 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.10.7",
     "@types/pdfjs-dist": "^2.10.377",
+    "fs-extra": "^11.3.0",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"

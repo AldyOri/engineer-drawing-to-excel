@@ -8,6 +8,7 @@ export interface Personnel {
 }
 
 export interface ExtractedData {
+  projectName: string | null;
   drawingNumber: string | null;
   title: string | null;
   types: string[] | null;
