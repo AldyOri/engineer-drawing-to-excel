@@ -13,8 +13,8 @@ A web-server application that extracts data from engineering drawings generated 
 
 ## Prerequisites
 
-- Node.js
-- Python
+- Node.js (v14 or higher)
+- Python (3.7 or higher)
 - npm or yarn package manager
 
 ## Installation
@@ -40,20 +40,28 @@ pip install -r scripts/requirements.txt
 cp .env.example .env
 ```
 
-5. Add your Google AI API key to `.env`:
+5. Configure environment variables in `.env`:
 ```env
-API_KEY="your-api-key-here"
+API_KEY="your-google-ai-api-key-here"
+API_URL_INKA="https://inka.goovicess.com/api/project-types"
+API_KEY_INKA="your-inka-api-key-here"
 ```
 
 ## Building the Project
+
+The project uses TypeScript which needs to be compiled to JavaScript before running:
 
 ```bash
 npm run build
 ```
 
+This will:
+1. Clean the `dist/` directory (using fs-extra)
+2. Compile TypeScript files to JavaScript
+
 ## Running the Application
 
-Development mode:
+Development mode (with live reload):
 ```bash
 npm run dev
 ```
@@ -99,6 +107,7 @@ POST /api/v2/process
   - Manages PDF layers
   - Extracts first page
   - Uses AI to extract data
+  - Enriches data with project information from API
   - Generates Excel file
 - **Response**:
   ```json
@@ -124,17 +133,17 @@ engineer-drawing-to-excel/
 ├── src/
 │   ├── controllers/      # Request handlers
 │   ├── services/         # Business logic
-│   ├── utils/           # Utility functions
-│   ├── interfaces/      # TypeScript interfaces
-│   ├── config/          # Configuration files
-│   ├── constants/       # Constants and paths
-│   └── routes/          # API routes
+│   ├── utils/            # Utility functions
+│   ├── interfaces/       # TypeScript interfaces
+│   ├── config/           # Configuration files
+│   ├── constants/        # Constants and paths
+│   └── routes/           # API routes
 ├── scripts/
-│   ├── pdf_processor.py # Python PDF processing
-│   └── requirements.txt # Python dependencies
-├── uploads/            # Upload directories
-├── outputs/            # Generated files
-└── dist/               # Compiled version of src/ directory
+│   ├── pdf_processor.py  # Python PDF processing
+│   └── requirements.txt  # Python dependencies
+├── uploads/              # Upload directories
+├── outputs/              # Generated files
+└── dist/                 # Compiled version of src/ directory
 ```
 
 ## Technical Details
@@ -144,12 +153,24 @@ engineer-drawing-to-excel/
 - **AI Processing**: Google Generative AI (Gemini 2.0 Flash)
 - **PDF Processing**: PyMuPDF (Python)
 - **Excel Generation**: ExcelJS
+- **Project Data**: Integration with INKA API
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| API_KEY  | Google Generative AI API key |
+| Variable     | Description                           |
+|------------- |---------------------------------------|
+| API_KEY      | Google Generative AI API key          |
+| API_URL_INKA | URL for INKA project data API         |
+| API_KEY_INKA | API key for INKA project data access  |
+
+## Scripts
+
+| Script   | Description                               |
+|----------|-------------------------------------------|
+| build    | Compiles TypeScript to JavaScript         |
+| clean    | Removes the dist/ directory               |
+| dev      | Runs the app with live reloading (nodemon)|
+| start    | Runs the compiled app for production      |
 
 ## Author
 
